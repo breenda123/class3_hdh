@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 3 & 4: Hệ Điều Hành</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+        #presentation-container {
+            background-image: url('image.png');
+            background-size: cover;
+            background-position: center;
+        }
+        .slide {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            visibility: hidden;
+        }
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            z-index: 10;
+        }
+        .nav-dot.active {
+            background-color: #3b82f6;
+            transform: scale(1.25);
+        }
+        .rounded-t-lg{
+            width: 220px;
+            height:300px;
+            object-fit: contain;
+        }
+
+        /* General Animation Utilities */
+        .animated {
+            animation-duration: 1s;
+            animation-fill-mode: both;
+            visibility: hidden;
+        }
+        .slide.active .animated {
+            visibility: visible;
+        }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-400 { animation-delay: 0.4s; }
+        .delay-600 { animation-delay: 0.6s; }
+        .delay-800 { animation-delay: 0.8s; }
+
+        /* Keyframe Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .fadeIn { animation-name: fadeIn; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translate3d(0, 40px, 0); }
+            to { opacity: 1; transform: translate3d(0, 0, 0); }
+        }
+        .fadeInUp { animation-name: fadeInUp; }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale3d(0.3, 0.3, 0.3); }
+            to { opacity: 1; transform: scale3d(1, 1, 1); }
+        }
+        .zoomIn { animation-name: zoomIn; }
+        
+        @keyframes bounceIn {
+            from, 20%, 40%, 60%, 80%, to { animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1); }
+            0% { opacity: 0; transform: scale3d(0.3, 0.3, 0.3); }
+            20% { transform: scale3d(1.1, 1.1, 1.1); }
+            40% { transform: scale3d(0.9, 0.9, 0.9); }
+            60% { opacity: 1; transform: scale3d(1.03, 1.03, 1.03); }
+            80% { transform: scale3d(0.97, 0.97, 0.97); }
+            to { opacity: 1; transform: scale3d(1, 1, 1); }
+        }
+        .bounceIn { animation-name: bounceIn; }
+
+        @keyframes tada {
+            from { transform: scale3d(1, 1, 1); }
+            10%, 20% { transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, -3deg); }
+            30%, 50%, 70%, 90% { transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 3deg); }
+            40%, 60%, 80% { transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -3deg); }
+            to { transform: scale3d(1, 1, 1); }
+        }
+        .tada { animation-name: tada; }
+
+        /* Animation for slide 6 arrows */
+        .animated-arrows {
+            position: relative;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 120px;
+        }
+        .animated-arrows span {
+            position: absolute;
+            opacity: 0;
+            animation: arrow-flow-right 3s infinite;
+            color: #3b82f6;
+        }
+        .animated-arrows span:nth-child(1) { animation-delay: 0s; }
+        .animated-arrows span:nth-child(2) { animation-delay: 0.2s; }
+        .animated-arrows span:nth-child(3) { animation-delay: 0.4s; }
+        .animated-arrows span.left {
+            animation-name: arrow-flow-left;
+            color: #f59e0b;
+        }
+        .animated-arrows span.left:nth-child(4) { animation-delay: 1.5s; }
+        .animated-arrows span.left:nth-child(5) { animation-delay: 1.7s; }
+        .animated-arrows span.left:nth-child(6) { animation-delay: 1.9s; }
+
+        @keyframes arrow-flow-right {
+            0% { transform: translateX(-30px); opacity: 0; }
+            20% { opacity: 1; }
+            40% { transform: translateX(30px); opacity: 0; }
+            100% { transform: translateX(30px); opacity: 0; }
+        }
+
+        @keyframes arrow-flow-left {
+            0% { transform: translateX(30px); opacity: 0; }
+            20% { opacity: 1; }
+            40% { transform: translateX(-30px); opacity: 0; }
+            100% { transform: translateX(-30px); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="bg-blue-50 text-gray-800 h-screen w-screen relative">
+
+    <!-- Main Presentation Container -->
+    <div id="presentation-container" class="w-full h-full bg-white shadow-2xl overflow-hidden relative">
+        
+        <!-- Slide 1: Title -->
+        <div class="slide active flex flex-col items-center justify-center p-8 text-center" data-slide="0">
+            <img src="logo.png" alt="Logo" class="absolute top-6 right-6 w-20 z-30 bg-white/80 p-2 rounded-full border-4 border-blue-500">
+            <div class="slide-content w-full bg-white/70 backdrop-blur-sm p-8 rounded-2xl">
+                <h1 class="text-5xl md:text-8xl font-black text-blue-800 mb-4 animated zoomIn">BÀI 3 & 4: HỆ ĐIỀU HÀNH</h1>
+                <h2 class="text-3xl md:text-5xl font-bold text-indigo-600 mb-8 animated fadeInUp delay-200">Người Chỉ Huy Vĩ Đại Của Máy Tính</h2>
+                <img src="computer.webp" alt="Máy tính hoạt hình đang cười và vẫy tay" class="mx-auto rounded-lg shadow-lg mb-8 max-w-xl h-96 object-contain animated fadeInUp delay-400">
+                <p class="text-2xl text-gray-600 animated fadeInUp delay-600">Tên giáo viên | Môn Tin học - Lớp 3</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Objectives -->
+        <div class="slide flex flex-col items-center justify-center p-8" data-slide="1">
+            <img src="logo.png" alt="Logo" class="absolute top-6 right-6 w-20 z-30 bg-white/80 p-2 rounded-full border-4 border-blue-500">
+            <div class="slide-content w-full max-w-4xl bg-white/70 backdrop-blur-sm p-10 rounded-2xl">
+                <h1 class="text-4xl md:text-6xl font-black text-center text-blue-800 mb-12 animated zoomIn">HÔM NAY CHÚNG MÌNH SẼ LÀM GÌ?</h1>
+                <div class="space-y-8">
+                    <div class="flex items-center bg-white p-6 rounded-xl shadow-md border-l-8 border-green-400 animated fadeInUp delay-200">
+                        <div class="bg-green-100 p-3 rounded-full mr-6"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 0-7.52 16.96l-.54 1.62a1 1 0 0 0 1.52 1.52l1.62-.54A10 10 0 0 0 12 22a10 10 0 0 0 0-20z"/><path d="M12 18h.01"/><path d="M12 14a4 4 0 1 0-4-4"/></svg></div>
+                        <span class="text-3xl md:text-4xl font-bold">1. Giải mã được "Hệ điều hành" là gì.</span>
+                    </div>
+                    <div class="flex items-center bg-white p-6 rounded-xl shadow-md border-l-8 border-yellow-400 animated fadeInUp delay-400">
+                        <div class="bg-yellow-100 p-3 rounded-full mr-6"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></div>
+                        <span class="text-3xl md:text-4xl font-bold">2. Nhận biết được 4 "nhạc trưởng" nổi tiếng.</span>
+                    </div>
+                    <div class="flex items-center bg-white p-6 rounded-xl shadow-md border-l-8 border-red-400 animated fadeInUp delay-600">
+                        <div class="bg-red-100 p-3 rounded-full mr-6"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>
+                        <span class="text-3xl md:text-4xl font-bold">3. Trở thành "nhà thám hiểm" trên màn hình Windows.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Starter Activity -->
+        <div class="slide flex flex-col items-center justify-center p-8 text-center" data-slide="2">
+            <img src="logo.png" alt="Logo" class="absolute top-6 right-6 w-20 z-30 bg-white/80 p-2 rounded-full border-4 border-blue-500">
+            <div class="slide-content w-full bg-white/70 backdrop-blur-sm p-8 rounded-2xl">
+                <h1 class="text-4xl md:text-6xl font-black text-red-600 mb-6 animated bounceIn">KHỞI ĐỘNG: DÀN NHẠC RỐI TUNG!</h1>
+                <img src="loxon.png" alt="Dàn nhạc chơi loạn xạ" class="mx-auto rounded-lg shadow-lg mb-8 max-w-xl h-96 object-cover animated zoomIn delay-200">
+                <p class="text-3xl md:text-4xl font-bold bg-yellow-200 text-yellow-800 p-4 rounded-lg inline-block animated tada delay-400">Ôi không! Chuyện gì đang xảy ra với dàn nhạc này vậy các em? Liệu họ có tạo ra được một bản nhạc hay không? Tại sao?</p>
+            </div>
+        </div>
+
+        <!-- Slide 4: The Savior -->
+        <div class="slide flex flex-col items-center justify-center p-8 text-center" data-slide="3">
+            <img src="logo.png" alt="Logo" class="absolute top-6 right-6 w-20 z-30 bg-white/80 p-2 rounded-full border-4 border-blue-500">
+            <div class="slide-content w-full bg-white/70 backdrop-blur-sm p-8 rounded-2xl">
+                <h1 class="text-4xl md:text-6xl font-black text-green-600 mb-6 animated bounceIn">CẦN MỘT NHẠC TRƯỞNG!</h1>
+                <img src="conhactruong.png" alt="Dàn nhạc có nhạc trưởng chỉ huy" class="mx-auto rounded-lg shadow-lg mb-8 max-w-xl h-96 object-cover animated zoomIn delay-200">
+                <p class="text-4xl md:text-5xl font-bold text-green-800 p-4 rounded-lg animated tada delay-400">A! Nhờ có Nhạc trưởng, mọi thứ đã vào trật tự!</p>
+            </div>
+        </div>
+
+        <!-- Slide 5: Computer Analogy -->
+        <div class="slide flex flex-col items-center justify-center p-8 text-center" data-slide="4">
+            <img src="logo.png" alt="Logo" class="absolute top-6 right-6 w-20 z-30 bg-white/80 p-2 rounded-full border-4 border-blue-500">
+            <div class="slide-content w-full bg-white/70 backdrop-blur-sm p-8 rounded-2xl">
+                <h1 class="text-4xl md:text-6xl font-black text-blue-800 mb-10 animated fadeIn">MÁY TÍNH CŨNG CẦN MỘT "NHẠC TRƯỞNG"</h1>
+                <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
+                    <div class="bg-gray-100 p-6 rounded-xl shadow-md text-center animated zoomIn delay-200">
+                        <img src="chuot.webp" alt="Các phần cứng" class="rounded-lg mx-auto w-64 h-40 object-cover">
+                        <p class="mt-4 text-2xl font-bold">Các phần cứng</p>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500 rotate-90 md:rotate-0 animated fadeIn delay-400"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    <div class="bg-blue-100 p-6 rounded-xl shadow-md text-center border-4 border-blue-400 animated zoomIn delay-600">
+                        <img src="hedieuhanh.jpg" alt="Chip hoạt hình đội mũ chỉ huy" class="rounded-lg mx-auto w-64 h-40 object-cover">
+                        <p class="mt-4 text-2xl font-bold">Cần người chỉ huy</p>
+                    </div>
+                </div>
+                <p class="mt-12 text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 animated fadeInUp delay-800">Người chỉ huy đó chính là... HỆ ĐIỀU HÀNH!</p>
+            </div>
+        </div>
+
+        <!-- Slide 6: What is an OS? -->
+        <div class="slide flex flex-col items-center justify-center p-8" data-slide="5">
+            <img src="logo.png" alt="Logo" class="absolute top-6 right-6 w-20 z-30 bg-white/80 p-2 rounded-full border-4 border-blue-500">
+            <div class="slide-content w-full max-w-5xl text-center bg-white/70 backdrop-blur-sm p-8 rounded-2xl">
+                <h1 class="text-4xl md:text-6xl font-black text-blue-800 mb-8 animated fadeIn">VẬY HỆ ĐIỀU HÀNH LÀ GÌ?</h1>
+                <div class="bg-yellow-100 border-l-8 border-yellow-400 text-yellow-800 p-8 rounded-lg shadow-lg text-left text-3xl md:text-4xl space-y-4 animated fadeInUp delay-200">
+                    <p>Là <strong>phần mềm quan trọng nhất</strong>, được cài đặt đầu tiên vào máy tính.</p>
+                    <p>Nó làm <strong>cầu nối</strong>, giúp chúng ta giao tiếp và điều khiển máy tính.</p>
+                </div>
+                <div class="mt-12 flex items-center justify-around text-2xl md:text-3xl font-bold animated fadeIn delay-400">
+                    <div class="bg-green-200 p-4 rounded-lg text-center">Người dùng</div>
+                    <div class="animated-arrows text-5xl">
+                        <span>&gt;</span><span>&gt;</span><span>&gt;</span>
+                        <span class="left">&lt;</span><span class="left">&lt;</span><span class="left">&lt;</span>
+                    </div>
+                    <div class="bg-blue-200 p-4 rounded-lg text-center">Hệ điều hành</div>
+                    <div class="animated-arrows text-5xl">
+                        <span>&gt;</span><span>&gt;</span><span>&gt;</span>
+                        <span class="left">&lt;</span><span class="left">&lt;</span><span class="left">&lt;</span>
+                    </div>
+                    <div class="bg-red-200 p-4 rounded-lg text-center">Phần cứng</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Main Tasks -->
+        <div class="slide flex flex-col items-center justify-center p-8" data-slide="6">
+            <img src="logo.png" alt="Logo" class="absolute top-6 right-6 w-20 z-30 bg-white/80 p-2 rounded-full border-4 border-blue-500">
+            <div class="slide-content w-full max-w-5xl bg-white/70 backdrop-blur-sm p-8 rounded-2xl">
+                <h1 class="text-4xl md:text-6xl font-black text-center text-blue-800 mb-10 animated fadeIn">"NHẠC TRƯỞNG" HỆ ĐIỀU HÀNH LÀM GÌ?</h1>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-8 rounded-xl shadow-lg text-center animated zoomIn delay-200">
+                        <h2 class="text-3xl font-bold text-purple-700 mb-4">ĐIỀU KHIỂN PHẦN CỨNG</h2>
+                        <img src="phancung.jpg" alt="CPU, RAM, Loa" class="mx-auto rounded-lg mb-4 h-48 w-full object-cover">
+                        <p class="text-xl">Ra lệnh cho loa phát nhạc, cho màn hình hiển thị hình ảnh, cho máy in in bài...</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-xl shadow-lg text-center animated zoomIn delay-400">
+                        <h2 class="text-3xl font-bold text-teal-700 mb-4">LÀM NỀN CHO PHẦN MỀM KHÁC</h2>
+                        <img src="phanmem.jpg" alt="Icon game, Youtube, Paint" class="mx-auto rounded-lg mb-4 h-48 w-full object-cover">
+                        <p class="text-xl">Giúp các phần mềm Word, Paint, Games có thể chạy và hoạt động được.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Famous OS Intro -->
+        <div class="slide flex flex-col items-center justify-center p-8 text-center" data-slide="7">
+            <img src="logo.png" alt="Logo" class="absolute top-6 right-6 w-20 z-30 bg-white/80 p-2 rounded-full border-4 border-blue-500">
+            <div class="slide-content w-full bg-white/70 backdrop-blur-sm p-8 rounded-2xl">
+                <h1 class="text-4xl md:text-6xl font-black text-blue-800 mb-8 animated fadeIn">CÓ RẤT NHIỀU "NHẠC TRƯỞNG" KHÁC NHAU!</h1>
+                <div class="flex justify-center items-end gap-8">
+                    <img src="window.png" alt="Bục sân khấu 1" class="rounded-t-lg shadow-lg animated bounceIn delay-200">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/71/Finder_icon_macOS_Yosemite.png" alt="Bục sân khấu 2" class="rounded-t-lg shadow-lg animated bounceIn delay-400">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Android_robot.svg/1200px-Android_robot.svg.png" alt="Bục sân khấu 3" class="rounded-t-lg shadow-lg animated bounceIn delay-600">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIpbTCFq_ny6sYPDnJGGZGK-0mLUonC9KWJD7TA3KwhQnj_Dekg5YdiiQw1_qnA2u0T0w&usqp=CAU" alt="Bục sân khấu 4" class="rounded-t-lg shadow-lg animated bounceIn delay-800">
+                </div>
+                <p class="mt-8 text-3xl md:text-4xl font-bold text-gray-700 animated fadeInUp">Hãy cùng làm quen với 4 hệ điều hành nổi tiếng nhất nhé!</p>
+            </div>
+        </div>
+
+        <!-- Slide 9: Windows -->
+        <div class="slide flex flex-col items-center justify-center p-8 text-center bg-[#0078D4]/80" data-slide="8">
+            <img src="logo.png" alt="Logo" class="absolute top-6 right-6 w-20 z-30 bg-white/80 p-2 rounded-full border-4 border-blue-500">
+            <div class="slide-content w-full text-white">
+                <svg class="w-40 h-40 mx-auto mb-6 animated zoomIn" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 13.63L45.42 8.11V48.11H0V13.63Z" fill="white"/>
+                    <path d="M52.27 7.27L100 0V48.11H52.27V7.27Z" fill="white"/>
+                    <path d="M0 51.89H45.42V91.89L0 86.37V51.89Z" fill="white"/>
+                    <path d="M52.27 51.89H100V100L52.27 92.73V51.89Z" fill="white"/>
+                </svg>
+                <h1 class="text-4xl md:text-6xl font-black mb-4 animated fadeInUp delay-200">WINDOWS - NGƯỜI BẠN QUEN THUỘC</h1>
+                <p class="text-2xl md:text-3xl max-w-2xl mx-auto animated fadeInUp delay-400">Hệ điều hành có trên hầu hết máy tính ở trường học và ở nhà.</p>
+            </div>
+        </div>
+
+        <!-- Slide 10: macOS -->
+        <div class="slide flex flex-col items-center justify-center p-8 text-center bg-gray-900/80" data-slide="9">
+            <img src="logo.png" alt="Logo" class="absolute top-6 right-6 w-20 z-30 bg-white/80 p-2 rounded-full border-4 border-blue-500">
+            <div class="slide-content w-full text-white">
+                <img src="mac.svg" alt="Mac OS" class="mx-auto rounded-lg shadow-lg mb-8 h-48 w-auto animated zoomIn">
+                <h1 class="text-4xl md:text-6xl font-black mb-4 animated fadeInUp delay-200">MACOS - ANH CHÀNG SÀNH ĐIỆU</h1>
+                <p class="text-2xl md:text-3xl max-w-2xl mx-auto animated fadeInUp delay-400">Hệ điều hành của các máy tính Apple (Macbook) nổi tiếng vì rất đẹp và mượt.</p>
+            </div>
+        </div>
+
+        <!-- Slide 11: Android -->
+        <div class="slide flex flex-col items-center justify-center p-8 text-center bg-[#A4C639]/80" data-slide="10">
+            <img src="logo.png" alt="Logo" class="absolute top-6 right-6 w-20 z-30 bg-white/80 p-2 rounded-full border-4 border-blue-500">
+            <div class="slide-content w-full text-white">
+                <img src="https://www.vectorlogo.zone/logos/android/android-ar21.svg" alt="Android" class="mx-auto rounded-lg shadow-lg mb-8 h-48 w-auto bg-white/80 animated bounceIn">
+                <h1 class="text-4xl md:text-6xl font-black mb-4 animated fadeInUp delay-200">ANDROID - CHÚ ROBOT XANH</h1>
+                <p class="text-2xl md:text-3xl max-w-2xl mx-auto animated fadeInUp delay-400">Hệ điều hành phổ biến nhất trên điện thoại (Samsung, OPPO, Xiaomi...).</p>
+            </div>
+        </div>
+
+        <!-- Slide 12: iOS -->
+        <div class="slide flex flex-col items-center justify-center p-8 text-center" data-slide="11">
+            <img src="logo.png" alt="Logo" class="absolute top-6 right-6 w-20 z-30 bg-white/80 p-2 rounded-full border-4 border-blue-500">
+            <div class="slide-content w-full text-gray-800 bg-white/70 backdrop-blur-sm p-8 rounded-2xl">
+                <img src="ios.svg" alt="Logo iOS trên màn hình iPhone" class="mx-auto rounded-lg shadow-lg mb-6 h-48 w-auto object-contain animated zoomIn">
+                <h1 class="text-4xl md:text-6xl font-black mb-4 animated fadeInUp delay-200">IOS - NGƯỜI BẠN RIÊNG CỦA IPHONE</h1>
+                <p class="text-2xl md:text-3xl max-w-2xl mx-auto animated fadeInUp delay-400">Hệ điều hành này chỉ được dùng cho các sản phẩm của Apple như iPhone, iPad.</p>
+            </div>
+        </div>
+
+        <!-- Slide 13: Quiz 1 -->
+        <div class="slide flex flex-col items-center justify-center p-8" data-slide="12">
+            <img src="logo.png" alt="Logo" class="absolute top-6 right-6 w-20 z-30 bg-white/80 p-2 rounded-full border-4 border-blue-500">
+            <div class="slide-content w-full max-w-3xl text-center bg-white/70 backdrop-blur-sm p-8 rounded-2xl">
+                <h1 class="text-4xl md:text-6xl font-black text-blue-800 mb-8 animated fadeIn">TRÒ CHƠI NHANH: NHÌN HÌNH ĐOÁN TÊN!</h1>
+                <div class="bg-white p-8 rounded-xl shadow-lg animated zoomIn delay-200">
+                    <img src="https://www.vectorlogo.zone/logos/android/android-ar21.svg" alt="Android" class="mx-auto rounded-lg shadow-lg mb-8 h-48 w-auto">
+                    <div class="grid grid-cols-2 gap-4 text-2xl font-bold">
+                        <button class="p-4 bg-red-200 rounded-lg hover:bg-red-300 transform hover:scale-105 transition-transform duration-200">A. Windows</button>
+                        <button class="p-4 bg-blue-200 rounded-lg hover:bg-blue-300 transform hover:scale-105 transition-transform duration-200">B. iOS</button>
+                        <button class="p-4 bg-green-200 rounded-lg hover:bg-green-300 transform hover:scale-105 transition-transform duration-200">C. Android</button>
+                        <button class="p-4 bg-yellow-200 rounded-lg hover:bg-yellow-300 transform hover:scale-105 transition-transform duration-200">D. macOS</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Transition -->
+        <div class="slide flex flex-col items-center justify-center p-8 text-center" data-slide="13">
+            <img src="logo.png" alt="Logo" class="absolute top-6 right-6 w-20 z-30 bg-white/80 p-2 rounded-full border-4 border-blue-500">
+            <div class="slide-content w-full bg-white/70 backdrop-blur-sm p-8 rounded-2xl">
+                <h1 class="text-4xl md:text-6xl font-black text-green-800 mb-6 animated bounceIn">TUYỆT VỜI! CÁC EM RẤT NHỚ BÀI!</h1>
+                <p class="text-3xl md:text-4xl mb-8 animated fadeInUp delay-200">"Bây giờ, hãy cất cây đũa nhạc trưởng đi... và lấy bản đồ ra nào!"</p>
+                <img src="https://png.pngtree.com/png-clipart/20250120/original/pngtree-boy-explorer-in-hat-holding-a-map-and-cup-png-image_19963963.png" alt="Bạn nhỏ đội mũ thám hiểm" class="mx-auto rounded-lg shadow-lg mb-8 max-w-xl h-96 object-contain animated zoomIn delay-400">
+                <h2 class="text-4xl md:text-5xl font-bold text-teal-700 animated fadeInUp delay-600">CHÚNG TA SẼ TRỞ THÀNH NHÀ THÁM HIỂM!</h2>
+            </div>
+        </div>
+
+        <!-- Slide 15: Windows Map -->
+        <div class="slide flex flex-col items-center justify-center p-8" data-slide="14">
+            <img src="logo.png" alt="Logo" class="absolute top-6 right-6 w-20 z-30 bg-white/80 p-2 rounded-full border-4 border-blue-500">
+            <div class="slide-content w-full max-w-6xl bg-white/70 backdrop-blur-sm p-8 rounded-2xl">
+                <h1 class="text-4xl md:text-6xl font-black text-center text-blue-800 mb-6 animated fadeIn">BẢN ĐỒ KHÁM PHÁ</h1>
+                <div class="relative w-full h-[65vh] bg-blue-300 rounded-lg shadow-inner bg-cover bg-center animated zoomIn delay-200" style="background-image: url('https://i.ytimg.com/vi/909IFXNJRQ0/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLBszI4VEFekA5zuKTsxfzi1-aremQ');">
+                    <!-- Annotations -->
+                    <div class="absolute top-10 left-10 p-2 bg-white/80 backdrop-blur-sm rounded-md shadow text-xl font-bold animated bounceIn delay-400">Màn hình nền (Desktop)</div>
+                    <div class="absolute top-24 left-10 p-2 bg-white/80 backdrop-blur-sm rounded-md shadow text-xl font-bold animated bounceIn delay-600">Các biểu tượng (Icons)</div>
+                    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 p-2 bg-white/80 backdrop-blur-sm rounded-md shadow text-xl font-bold animated bounceIn delay-800">Thanh tác vụ (Taskbar)</div>
+                    <div class="absolute bottom-10 left-10 p-2 bg-white/80 backdrop-blur-sm rounded-md shadow text-xl font-bold animated bounceIn delay-800">Nút Start</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: Icon Types -->
+        <div class="slide flex flex-col items-center justify-center p-8" data-slide="15">
+            <img src="logo.png" alt="Logo" class="absolute top-6 right-6 w-20 z-30 bg-white/80 p-2 rounded-full border-4 border-blue-500">
+            <div class="slide-content w-full max-w-5xl bg-white/70 backdrop-blur-sm p-8 rounded-2xl">
+                <h1 class="text-4xl md:text-6xl font-black text-center text-blue-800 mb-10 animated fadeIn">PHÂN LOẠI "KHO BÁU" (ICONS)</h1>
+                <div class="grid md:grid-cols-2 gap-8 text-lg">
+                    <div class="bg-white p-8 rounded-xl shadow-lg animated zoomIn delay-200">
+                        <h2 class="text-3xl font-bold text-blue-700 mb-4 text-center">BIỂU TƯỢNG HỆ THỐNG</h2>
+                        <img src="thispc.webp" alt="Icon This PC, Recycle Bin" class="mx-auto rounded-lg mb-4 h-40 w-full object-contain">
+                        <p class="font-bold">Đặc điểm:</p>
+                        <p class="mb-2">Là "công cụ có sẵn" của máy tính, rất quan trọng.</p>
+                        <p class="font-bold">Ví dụ:</p>
+                        <p>This PC (Máy tính của tôi), Recycle Bin (Thùng rác).</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-xl shadow-lg animated zoomIn delay-400">
+                        <h2 class="text-3xl font-bold text-green-700 mb-4 text-center">BIỂU TƯỢNG ỨNG DỤNG</h2>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Google_Chrome_icon_%28February_2022%29.svg/2048px-Google_Chrome_icon_%28February_2022%29.svg.png" alt="Icon Chrome, Zalo, Paint" class="mx-auto rounded-lg mb-4 h-40 w-full object-contain">
+                        <p class="font-bold">Đặc điểm:</p>
+                        <p class="mb-2">Là phần mềm chúng ta cài thêm vào để học, để chơi.</p>
+                        <p class="font-bold">Ví dụ:</p>
+                        <p>Google Chrome, Zalo, trò chơi...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: Challenge 1 -->
+        <div class="slide flex flex-col items-center justify-center p-8" data-slide="16">
+            <img src="logo.png" alt="Logo" class="absolute top-6 right-6 w-20 z-30 bg-white/80 p-2 rounded-full border-4 border-blue-500">
+            <div class="slide-content w-full max-w-3xl bg-white/70 backdrop-blur-sm p-8 rounded-2xl">
+                <h1 class="text-4xl md:text-6xl font-black text-center text-orange-600 mb-8 animated bounceIn">NHIỆM VỤ: MỞ CÁNH CỬA START</h1>
+                <div class="space-y-4 text-xl md:text-3xl bg-white p-8 rounded-xl shadow-lg">
+                    <div class="flex items-center gap-4 animated fadeInUp delay-200">
+                        <span class="flex-shrink-0 bg-orange-500 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold">1</span>
+                        <p>Dùng chuột di chuyển đến biểu tượng lá cờ ở góc dưới cùng bên trái.</p>
+                    </div>
+                    <div class="flex items-center gap-4 animated fadeInUp delay-400">
+                        <span class="flex-shrink-0 bg-orange-500 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold">2</span>
+                        <p>Nháy chuột trái 1 lần.</p>
+                    </div>
+                    <div class="flex items-center gap-4 animated fadeInUp delay-600">
+                        <span class="flex-shrink-0 bg-orange-500 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold">3</span>
+                        <p>Quan sát xem có những gì xuất hiện nhé!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 18: Challenge 2 -->
+        <div class="slide flex flex-col items-center justify-center p-8" data-slide="17">
+            <img src="logo.png" alt="Logo" class="absolute top-6 right-6 w-20 z-30 bg-white/80 p-2 rounded-full border-4 border-blue-500">
+            <div class="slide-content w-full max-w-3xl bg-white/70 backdrop-blur-sm p-8 rounded-2xl">
+                <h1 class="text-4xl md:text-6xl font-black text-center text-purple-600 mb-8 animated bounceIn">NHIỆM VỤ: KHÁM PHÁ THÙNG RÁC</h1>
+                <div class="space-y-4 text-xl md:text-3xl bg-white p-8 rounded-xl shadow-lg">
+                    <div class="flex items-center gap-4 animated fadeInUp delay-200">
+                        <span class="flex-shrink-0 bg-purple-500 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold">1</span>
+                        <p>Tìm biểu tượng Thùng rác (Recycle Bin) trên màn hình nền.</p>
+                    </div>
+                    <div class="flex items-center gap-4 animated fadeInUp delay-400">
+                        <span class="flex-shrink-0 bg-purple-500 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold">2</span>
+                        <p><strong>Thử thách khó hơn:</strong> Nháy đúp chuột (nháy chuột trái 2 lần thật nhanh) để mở nó ra.</p>
+                    </div>
+                    <div class="flex items-center gap-4 animated fadeInUp delay-600">
+                        <span class="flex-shrink-0 bg-purple-500 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold">3</span>
+                        <p>Tìm và bấm vào dấu "X" ở góc trên bên phải để đóng lại.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 19: Consolidation Game -->
+        <div class="slide flex flex-col items-center justify-center p-8 text-center" data-slide="18">
+            <img src="logo.png" alt="Logo" class="absolute top-6 right-6 w-20 z-30 bg-white/80 p-2 rounded-full border-4 border-blue-500">
+            <div class="slide-content w-full bg-white/70 backdrop-blur-sm p-8 rounded-2xl">
+                <h1 class="text-4xl md:text-6xl font-black text-yellow-800 mb-6 animated bounceIn">AI LÀ NHÀ THÁM HIỂM TÀI BA NHẤT?</h1>
+                <img src="https://png.pngtree.com/png-clipart/20230914/original/pngtree-treasure-map-png-image_12097326.png" alt="Hòn đảo kho báu" class="mx-auto rounded-lg shadow-lg mb-8 max-w-xl h-96 object-contain animated zoomIn delay-200">
+                <p class="text-3xl md:text-4xl font-bold bg-white text-orange-700 p-4 rounded-lg inline-block animated tada delay-400">Sẵn sàng chưa nào? Chúng ta cùng vào Kahoot/Blooket để trả lời các câu hỏi cuối cùng và tìm ra người giỏi nhất!</p>
+            </div>
+        </div>
+
+        <!-- Slide 20: Summary -->
+        <div class="slide flex flex-col items-center justify-center p-8" data-slide="19">
+            <img src="logo.png" alt="Logo" class="absolute top-6 right-6 w-20 z-30 bg-white/80 p-2 rounded-full border-4 border-blue-500">
+            <div class="slide-content w-full max-w-5xl bg-white/70 backdrop-blur-sm p-8 rounded-2xl">
+                <h1 class="text-4xl md:text-6xl font-black text-center text-blue-800 mb-8 animated fadeIn">TỔNG KẾT & DẶN DÒ</h1>
+                <div class="grid md:grid-cols-2 gap-8 text-lg">
+                    <div class="bg-blue-100 p-6 rounded-lg animated fadeInUp delay-200">
+                        <h2 class="font-bold text-3xl mb-4 text-blue-900">Hôm nay chúng ta đã học được:</h2>
+                        <ul class="list-disc list-inside space-y-2 text-xl">
+                            <li>Hệ điều hành là "nhạc trưởng" điều khiển máy tính.</li>
+                            <li>Có 4 hệ điều hành nổi tiếng: Windows, macOS, Android, iOS.</li>
+                            <li>Màn hình Windows có 4 thành phần chính.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-green-100 p-6 rounded-lg animated fadeInUp delay-400">
+                        <h2 class="font-bold text-3xl mb-4 text-green-900">Nhiệm vụ về nhà:</h2>
+                        <p class="text-xl">"Về nhà, em hãy hỏi bố mẹ xem điện thoại của gia đình mình dùng hệ điều hành Android (chú robot xanh) hay iOS (của iPhone) nhé!"</p>
+                    </div>
+                </div>
+                <p class="mt-12 text-center text-3xl font-bold text-gray-700 animated fadeInUp delay-600">Chào cả lớp và hẹn gặp lại trong các cuộc phiêu lưu tiếp theo!</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Navigation Controls -->
+    <div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-8">
+        <button id="prev-btn" class="p-3 rounded-full bg-white/50 backdrop-blur-sm shadow-md hover:bg-white transition disabled:opacity-50 disabled:cursor-not-allowed">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        
+        <div id="nav-dots" class="flex gap-2">
+            <!-- Dots will be generated by JS -->
+        </div>
+
+        <button id="next-btn" class="p-3 rounded-full bg-white/50 backdrop-blur-sm shadow-md hover:bg-white transition disabled:opacity-50 disabled:cursor-not-allowed">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const navDotsContainer = document.getElementById('nav-dots');
+        let currentSlide = 0;
+        const totalSlides = slides.length;
+
+        // Create navigation dots
+        for (let i = 0; i < totalSlides; i++) {
+            const dot = document.createElement('button');
+            dot.classList.add('nav-dot', 'w-3', 'h-3', 'bg-white/50', 'rounded-full', 'transition-all', 'duration-300');
+            dot.dataset.slide = i;
+            navDotsContainer.appendChild(dot);
+        }
+
+        const navDots = document.querySelectorAll('.nav-dot');
+
+        function showSlide(slideIndex) {
+            // Ensure index is within bounds
+            if (slideIndex >= totalSlides) {
+                slideIndex = totalSlides - 1;
+            }
+            if (slideIndex < 0) {
+                slideIndex = 0;
+            }
+
+            // Hide all slides
+            slides.forEach(slide => {
+                slide.classList.remove('active');
+            });
+
+            // Show the target slide
+            const newSlide = slides[slideIndex];
+            if (newSlide) {
+                newSlide.classList.add('active');
+            }
+            
+            // Update dots
+            navDots.forEach(dot => {
+                dot.classList.remove('active');
+            });
+            if (navDots[slideIndex]) {
+                navDots[slideIndex].classList.add('active');
+            }
+
+            // Update button states
+            prevBtn.disabled = slideIndex === 0;
+            nextBtn.disabled = slideIndex === totalSlides - 1;
+            
+            currentSlide = slideIndex;
+        }
+
+        // Event Listeners
+        nextBtn.addEventListener('click', () => {
+            showSlide(currentSlide + 1);
+        });
+
+        prevBtn.addEventListener('click', () => {
+            showSlide(currentSlide - 1);
+        });
+
+        navDotsContainer.addEventListener('click', (e) => {
+            if (e.target.matches('.nav-dot')) {
+                const slideIndex = parseInt(e.target.dataset.slide, 10);
+                showSlide(slideIndex);
+            }
+        });
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                showSlide(currentSlide + 1);
+            } else if (e.key === 'ArrowLeft') {
+                showSlide(currentSlide - 1);
+            }
+        });
+
+        // Initial setup
+        showSlide(0);
+    </script>
+</body>
+</html>
